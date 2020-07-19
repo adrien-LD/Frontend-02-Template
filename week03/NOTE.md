@@ -75,3 +75,5 @@ test2(); // Cannot access 'c' before initialization
 
 ### 其他
 除了课程学习外还阅读了[ECMAScript标准](https://www.ecma-international.org/ecma-262/11.0/index.html)得内容，标准得内容很多，本周只是读了关于语法得部分，关于标准得其他内容会在后续补充
+
+关于 **JavaScript 引擎里面 Realm 所有的对象** 实际上并没有想到获取方法，主要是在重学前端得课程中找到了winter对于内置对象得分类，暂时认为这个就是realm中得所有对象。
