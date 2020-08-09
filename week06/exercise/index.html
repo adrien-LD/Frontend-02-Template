@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>计算匹配函数</title>
+  </head>
+  <body>
+    <div id="cls" class="csa asd"></div>
+    <script>
+      // 根据字符将字符串分割为数组
+      function split(selector) {
+        function splitArr(splitChar) {
+          const selectorArr = [];
+          const arr = selector.split(splitChar);
+          const length = arr.length - 1;
+          arr.forEach((item, index) => {
+            if (index === length) {
+              selectorArr.push(item);
+            } else {
+              selectorArr.push(...[item, splitChar]);
+            }
+          });
+          return { joiner: splitChar, formatArr: selectorArr.reverse() };
+        }
+
+        if (selector.includes(" ")) {
+          return splitArr(" ");
+        }
+        if (selector.includes(">")) {
+          return splitArr(">");
+        }
+        if (selector.includes("+")) {
+          return splitArr("+");
+        }
+        return splitArr("~");
+      }
+
+      // 比较class是否符合
+      function compareClass(simpleSelector, element) {
+        const selectorClassArr = simpleSelector
+          .slice(simpleSelector.indexOf(".") + 1, simpleSelector.length)
+          .split(".");
+        const elementClassArr = element.className.split(" ");
+        for (const item of selectorClassArr) {
+          if (!elementClassArr.includes(item)) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // 比较当前元素与选择器是否匹配
+      function decideCurrent(simpleSelector, element) {
+        let flag = false;
+        const char = simpleSelector.charAt(0);
+        if (char === "#") {
+          if (
+            simpleSelector.includes(".") &&
+            compareClass(simpleSelector, element) &&
+            simpleSelector.includes(`#${element.id}`)
+          ) {
+            flag = true;
+          } else if (simpleSelector.includes(`#${element.id}`)) {
+            flag = true;
+          }
+        } else if (char === ".") {
+          if (
+            simpleSelector.includes("#") &&
+            simpleSelector.includes(`#${element.id}`) &&
+            compareClass(simpleSelector, element)
+          ) {
+            flag = true;
+          } else if (compareClass(simpleSelector, element)) {
+            flag = true;
+          }
+        } else {
+          if (
+            ((simpleSelector.includes("#") &&
+              simpleSelector.includes(`#${element.id}`)) ||
+              (simpleSelector.includes(".") &&
+                compareClass(simpleSelector, element)) ||
+              (simpleSelector.includes("#") &&
+                simpleSelector.includes(`#${element.id}`) &&
+                simpleSelector.includes(".") &&
+                compareClass(simpleSelector, element))) &&
+            simpleSelector.includes(element.tagName.toLowerCase())
+          ) {
+            flag = true;
+          } else if (simpleSelector.includes(element.tagName.toLowerCase())) {
+            flag = true;
+          }
+        }
+        return flag;
+      }
+
+      function decideSp(simpleSelector, element) {
+        if (element) {
+          if (decideCurrent(simpleSelector, element)) {
+            return true;
+          } else {
+            decideSp(simpleSelector, element.parentElement);
+          }
+        }
+        return false;
+      }
+
+      function decideCreaterThan(simpleSelector, element) {
+        return decideCurrent(simpleSelector, element);
+      }
+
+      function decideWavyLine(simpleSelector, otherElements) {
+        return otherElements.find((item) =>
+          decideCurrent(simpleSelector, item)
+        );
+      }
+
+      function decidePlus(simpleSelector, element) {
+        return decideCurrent(simpleSelector, element);
+      }
+
+      function match(selector, element) {
+        let flag = true;
+        const { joiner, formatArr: arr } = split(selector);
+        const children = element.parentElement.children;
+        const boolArr = [];
+        for (let i = 0; i < arr.length - 1; i++) {
+          if (arr[i] === joiner) {
+            i++;
+            switch (joiner) {
+              case " ":
+                boolArr.push(decideSp(arr[i], element.parentElement));
+                break;
+              case ">":
+                boolArr.push(decideCreaterThan(arr[i], element.parentElement));
+                break;
+              case "~":
+                const elements = children.slice(
+                  children.indexOf(element) + 1,
+                  children.length
+                );
+                boolArr.push(decideWavyLine(arr[i], elements));
+                break;
+              case "+":
+                const neighborElement = children[children.indexOf(element) + 1];
+                boolArr.push(decidePlus(arr[i], neighborElement));
+                break;
+            }
+          } else {
+            boolArr.push(decideCurrent(arr[i], element));
+          }
+        }
+        return !boolArr.includes(false);
+      }
+      const div = document.getElementById("cls");
+      console.log(match("body #cls", div));
+    </script>
+  </body>
+</html>
