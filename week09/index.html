@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      #cash {
+        width: 400px;
+        margin: 300px auto;
+      }
+
+      .grid {
+        width: 300px;
+        height: 300px;
+        display: grid;
+        grid-template-rows: repeat(3, 33%);
+        grid-template-columns: repeat(3, 33%);
+      }
+      .gridItem {
+        background-color: aquamarine;
+        height: 100px;
+        width: 100px;
+        border: 2px solid #f6f6f6;
+        line-height: 100px;
+        text-align: center;
+        font-size: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cash"></div>
+
+    <script>
+      const map = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+      let color = 1;
+      function init() {
+        const cash = document.getElementById('cash');
+        cash.innerHTML = '';
+        const div = document.createElement('div');
+        div.className = 'grid';
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            const gridDiv = document.createElement('div');
+            gridDiv.innerText =
+              map[i * 3 + j] === 2 ? '❌' : map[i * 3 + j] === 1 ? '⭕' : '';
+            gridDiv.className = 'gridItem';
+            gridDiv.addEventListener('click', () => click(i, j));
+            div.appendChild(gridDiv);
+          }
+        }
+        cash.appendChild(div);
+      }
+
+      function click(i, j) {
+        if (map[i * 3 + j] <= 0) {
+          map[i * 3 + j] = color;
+          update(i * 3 + j, color);
+          checkWin(color, i, j);
+          color = 3 - color;
+        }
+      }
+
+      function update(x, value) {
+        const list = document.getElementsByClassName('gridItem');
+        list[x].innerText = value === 2 ? '❌' : value === 1 ? '⭕' : '';
+      }
+
+      function checkWin(color, x, y) {
+        let win = false;
+        // 判断当前行是否三个相同
+        if (
+          map[3 * x + 0] === color &&
+          map[3 * x + 1] === color &&
+          map[3 * x + 2] === color
+        ) {
+          alert(color);
+          return;
+        }
+
+        // 判断当前列是否三个相同
+        if (
+          map[0 + y] === color &&
+          map[3 + y] === color &&
+          map[6 + y] === color
+        ) {
+          alert(color);
+          return;
+        }
+
+        // 判断斜线上是否三个相同
+        if (map[0] === color && map[4] === color && map[8] === color) {
+          alert(color);
+          return;
+        }
+
+        if (map[2] === color && map[4] === color && map[6] === color) {
+          alert(color);
+          return;
+        }
+      }
+
+      function alert(color) {
+        console.log(color === 1 ? '⭕ is winner' : '❌ is winner');
+      }
+      init();
+    </script>
+  </body>
+</html>

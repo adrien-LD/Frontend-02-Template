@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>寻路算法</title>
+    <style>
+      #root {
+        margin: 50px;
+        height: 800px;
+        width: 800px;
+        display: grid;
+        grid-template-rows: repeat(100, 1%);
+        grid-template-columns: repeat(100, 1%);
+      }
+
+      .span {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        background-color: #dedede;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <button id='savebtn'>save</button>
+    <button id='clear'>clear</button>
+
+    <script src="./index.js"></script>
+  </body>
+</html>
